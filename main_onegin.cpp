@@ -84,7 +84,7 @@ void print_text (char text[][LENGTH]){
 }
 
 int record_file (char text[][LENGTH]){
-    FILE *sort_file = fopen("SortOnegin.txt", "w");
+    FILE *sort_file = fopen("sort_onegin.txt", "w");
     
     for (int i = 0; i < LINES; i++){
         fprintf(sort_file, "%s", text[i]);
