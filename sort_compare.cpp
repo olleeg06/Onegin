@@ -1,12 +1,17 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <ctype.h>  
+#include <assert.h> 
 #include "sort_compare.h"
 
 
 int sort_text (int lines, char ** symbols_in_str, int* num_symbol_line,
                int (*compare_function)(const char* first, const char* second, int num_first, int num_second))
-{//TODO asserts
+{   
+    assert (symbols_in_str != NULL);
+    assert (num_symbol_line != NULL);
+    assert (lines != NULL);
+    
     for (size_t i = 0; i < lines - 1; i++){
         for (int line = 0; line < lines - 1; line++){
             if (compare_function (symbols_in_str[line], symbols_in_str[line + 1], num_symbol_line[line] - 1, num_symbol_line[line + 1] - 1) > 0){

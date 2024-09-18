@@ -21,9 +21,9 @@ int print_sort (char ** symbols_in_str, size_t lines, FILE *sort_file)
     return 0;
 }
 
-int print_original (char *buffer, FILE *sort_file, size_t num_all_symbol, size_t symbol_offset)
+int print_original (char *buffer, FILE *sort_file, size_t num_all_symbol)
 {
-    for (int i = 0; i < num_all_symbol - symbol_offset; i++){
+    for (int i = 0; i < num_all_symbol; i++){
         if (buffer[i] == NULL && buffer[i + 1] == NULL){
             buffer[i] = ' ';
             buffer[i + 1] = '\n';
