@@ -1,119 +1,82 @@
-#include <ctype.h>
-#include <string.h>
-#include <math.h>
-#include <cstdio>
-#include <string.h>
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include <ctype.h> 
+#include <assert.h> 
+#include "work_files.h"
+#include "sort_compare.h"
 
-enum sizes{
-    LINES = 30,
-    LENGTH = 70,
-    DIFFERENCE = 32,
-    CAPITAL_1 = 65,
-    CAPITAL_2 = 90
-};
 
-void swap_str (char* first, char* second);
-void print_text (char text[][LENGTH]);
-int str_compare (char* first, char* second);
-int reading_file ();
-int record_file (char text[][LENGTH]);
+int create_str (FILE* file, char* buffer, size_t num_all_symbol, int* symbol_offset);
+int arr_pointers (size_t num_all_symbol, int symbol_offset, int lines, char* buffer, char** arr_pointer, int* num_symbol_line); 
 
-char text[LINES][LENGTH] = {};
 
-int main(){
+int main() 
+{ 
+    FILE *file = fopen ("onegin_test.txt", "rb");
+    assert (file && "file open err");
+    size_t num_all_symbol = count_symbol (file);
 
-    reading_file();
+    char* buffer = (char*) calloc (num_all_symbol, sizeof(char));
+    assert (buffer != NULL);
 
-    for (int i = 0; i < LINES - 1; i++){
-        for (int j = 0; j < LINES - 1; j++){
-            if (str_compare (text[j], text[j + 1]) == 1){
-                swap_str (text[j], text[j + 1]);
-            }
+    int symbol_offset = 0;
+    int lines = create_str (file, buffer, num_all_symbol, &symbol_offset);
+    
+    char** arr_pointer = (char**) calloc (lines + 1, sizeof(char*));
+
+    int num_symbol_line[lines] = {};
+    arr_pointers (num_all_symbol, symbol_offset, lines, buffer, arr_pointer, num_symbol_line);         
+    
+    FILE *sort_file = fopen ("sort_onegin.txt", "wb");
+
+    sort_text (lines, arr_pointer, num_symbol_line, str_compare_start);
+    print_sort (arr_pointer, lines, sort_file); 
+
+    sort_text (lines, arr_pointer, num_symbol_line, str_compare_end);
+    print_sort (arr_pointer, lines, sort_file);
+
+    print_original (buffer, sort_file, num_all_symbol, symbol_offset);
+    fclose (sort_file);
+}
+
+
+int create_str (FILE* file, char* buffer,size_t num_all_symbol, int* symbol_offset)
+{
+    size_t lines = 0;
+    size_t symbol_offsett = 0;
+
+    for (size_t i = 0; i < num_all_symbol; i++){   
+        buffer[i - symbol_offsett] = fgetc (file);
+        if (buffer[i - symbol_offsett] == '\r'){
+            symbol_offsett++;                               
+            lines++;
+        } else if (buffer[i - symbol_offsett] == '\n'){
+            buffer[i - symbol_offsett] = '\0'; 
         }
     }
 
-    record_file(text);
+    *symbol_offset = symbol_offsett;
+
+    return lines;
+}
+
+int arr_pointers (size_t num_all_symbol, int symbol_offset, int lines, char* buffer, char** arr_pointer, int* num_symbol_line)
+{
+    int line = 1;
+    arr_pointer[0] = buffer;
+
+    for (size_t i = 0, index = 0, num = 0; i < num_all_symbol - symbol_offset; i++){
+        num++;
+        if (buffer[i] == '\0'){  
+            arr_pointer[line] = buffer + i + 1;
+            line++;
+            num_symbol_line[index] = num - 1;
+            index++;
+            num = 0;
+        }
+    }
+
     return 0;
 }
 
-void swap_str (char* first, char* second){
-    for (int i = 0; i < LENGTH - 1; i++){
-        char temp = first[i];
-        first[i] = second[i];
-        second[i] = temp;
-    }
-}
-
-
-int str_compare(char* first, char* second){
-    int first_index = 0;
-    int second_index = 0;
-    
-    for (int i = 0; i < LENGTH; i++){
-        char symbol_1 = first[i + first_index];
-        char symbol_2 = second[i + second_index];
-        
-        if (first[i + first_index] >= CAPITAL_1 && first[i + first_index] <= CAPITAL_2){
-            symbol_1 = first[i + first_index] + DIFFERENCE;
-        }
-        if (second[i + second_index] >= CAPITAL_1 && second[i + second_index] <= CAPITAL_2){
-            symbol_2 = second[i + second_index] + DIFFERENCE;
-        }
-        
-        if (isalpha(symbol_1) && isalpha(symbol_2) && i + first_index < LENGTH && i + second_index < LENGTH){
-            if (symbol_1 > symbol_2)
-                return 1;
-            else if (symbol_1 < symbol_2)
-                return -1;
-        } else if (isalpha(symbol_1) == 0 && i + first_index < LENGTH && i + second_index < LENGTH){
-            first_index++;
-            i--;
-        } else if (isalpha(symbol_2) == 0 && i + first_index < LENGTH && i + second_index < LENGTH){
-            second_index++;
-            i--;
-        }
-        
-    }
-    return 0;
-}
-
-void print_text (char text[][LENGTH]){
-    for (int i = 0; i < LINES; i++){
-        printf ("%s", text[i]);
-    }
-}
-
-int record_file (char text[][LENGTH]){
-    FILE *sort_file = fopen("sort_onegin.txt", "w");
-    
-    for (int i = 0; i < LINES; i++){
-        fprintf(sort_file, "%s", text[i]);
-    }
-    
-    fclose(sort_file);
-    
-    return 0;
-}
-
-int reading_file() {
-    FILE *file = fopen ("onegin.txt", "r");
-    
-    if (file == NULL) {
-        printf("Error opening file");
-    } else {
-        for (int i = 0; i < LINES; i++) {
-            int j = 0;
-           
-            while ((text[i][j] = fgetc(file)) != EOF && text[i][j] != '\n') {
-                j++;   
-            }
-
-            if (text[i][0] == '\n'){
-                text[i][j] = '\0';
-                i--;
-            } else          
-                text[i][j + 1] = '\0';
-        }
-    }
-    return 0;
-}
