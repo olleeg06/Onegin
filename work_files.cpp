@@ -1,7 +1,7 @@
 #include <stdio.h> 
 #include "work_files.h"
 
-int count_symbol (FILE* file)
+size_t count_symbol (FILE* file) 
 {    
     fseek (file, 0, SEEK_END);
     size_t nums = ftell(file);
@@ -13,7 +13,6 @@ int count_symbol (FILE* file)
 int print_sort (char ** symbols_in_str, size_t lines, FILE *sort_file)
 {    
     for (int i = 0; i < lines; i++){
-        int j = 0;
         fprintf(sort_file, "%s\n", symbols_in_str[i]);
     }
     
@@ -25,9 +24,13 @@ int print_sort (char ** symbols_in_str, size_t lines, FILE *sort_file)
 int print_original (char *buffer, FILE *sort_file, size_t num_all_symbol, size_t symbol_offset)
 {
     for (int i = 0; i < num_all_symbol - symbol_offset; i++){
-        if (buffer[i] == NULL)
-            buffer[i] = '\n';
-        fprintf(sort_file,"%c", buffer[i]);
+        if (buffer[i] == NULL && buffer[i + 1] == NULL){
+            buffer[i] = ' ';
+            buffer[i + 1] = '\n';
+            i++;
+        }
+
+        fputc (buffer[i], sort_file);
     }
 
     return 0;
