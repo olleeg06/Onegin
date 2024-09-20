@@ -9,9 +9,14 @@ enum sizes {
     CAPITAL_2 = 90
 };
 
-int sort_text (int lines, char ** symbols_in_str, int* num_symbol_line,
-               int (*compare_function)(const char* first,const char* second, int num_first, int num_second));            
-int str_compare_start (const char* first,const char* second, int num_first, int num_second);                 
-int str_compare_end (const char* first, const char* second, int num_first, int num_second);
+struct strocs{
+    char* arr_pointer;
+    int num_symbol_line; //size_line?
+    };
+
+int sort_text (int lines, struct strocs *keys, size_t num_no_alpha_line,
+               int (*compare_function)(char* first, char* second, int num_first, int num_second));            
+int str_compare_start (char* first, char* second, int num_first, int num_second);                 
+int str_compare_end (char* first, char* second, int num_first, int num_second);
 
 #endif

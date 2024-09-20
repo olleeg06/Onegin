@@ -5,24 +5,23 @@
 #include "sort_compare.h"
 
 
-int sort_text (int lines, char ** symbols_in_str, int* num_symbol_line,
-               int (*compare_function)(const char* first, const char* second, int num_first, int num_second))
+int sort_text (int lines, strocs *keys, size_t num_no_alpha_line,
+               int (*compare_function)(char* first, char* second, int num_first, int num_second))
 {   
-    assert (symbols_in_str != NULL);
-    assert (num_symbol_line != NULL);
+    assert (keys != NULL);
     assert (lines != NULL);
     
-    for (size_t i = 0; i < lines - 1; i++){
-        for (int line = 0; line < lines - 1; line++){
-            if (compare_function (symbols_in_str[line], symbols_in_str[line + 1], num_symbol_line[line] - 1, num_symbol_line[line + 1] - 1) > 0){
+    for (size_t i = 0; i < lines - num_no_alpha_line; i++){
+        for (int line = 0; line < lines; line++){
+            if (compare_function (keys[line].arr_pointer, keys[line + 1].arr_pointer, keys[line].num_symbol_line - 1, keys[line + 1].num_symbol_line - 1) > 0){
 
-                int tmp_int = num_symbol_line[line];
-                num_symbol_line[line] = num_symbol_line[line + 1];
-                num_symbol_line[line + 1] = tmp_int;
+                int tmp_int = keys[line].num_symbol_line;
+                keys[line].num_symbol_line = keys[line + 1].num_symbol_line;
+                keys[line + 1].num_symbol_line = tmp_int;
                 
-                char* tmp = symbols_in_str[line];
-                symbols_in_str[line] = symbols_in_str[line + 1];
-                symbols_in_str[line + 1] = tmp;
+                char* tmp = keys[line].arr_pointer;
+                keys[line].arr_pointer = keys[line + 1].arr_pointer;
+                keys[line + 1].arr_pointer = tmp;
             }
         }
     }
@@ -30,7 +29,7 @@ int sort_text (int lines, char ** symbols_in_str, int* num_symbol_line,
     return 0;
 }
 
-int str_compare_end (const char* first, const char* second, int num_first, int num_second)
+int str_compare_end (char* first, char* second, int num_first, int num_second)
 {
     for (int i = num_first, j = num_second; i >= 0 && j >= 0; i--, j--){
         if (isalpha (first[i]) && isalpha (second[j])){
@@ -47,7 +46,7 @@ int str_compare_end (const char* first, const char* second, int num_first, int n
     return 0;
 }
 
-int str_compare_start (const char* first,const char* second, int num_first, int num_second)
+int str_compare_start (char* first, char* second, int num_first, int num_second)
 {
     int first_index = 0;
     int second_index = 0;

@@ -1,5 +1,6 @@
 #include <stdio.h> 
 #include "work_files.h"
+#include "sort_compare.h"
 
 size_t count_symbol (FILE* file) 
 {    
@@ -10,10 +11,10 @@ size_t count_symbol (FILE* file)
     return nums;
 }
 
-int print_sort (char ** symbols_in_str, size_t lines, FILE *sort_file)
+int print_sort (struct strocs *keys, size_t lines, FILE *sort_file)
 {    
     for (int i = 0; i < lines; i++){
-        fprintf(sort_file, "%s\n", symbols_in_str[i]);
+        fprintf(sort_file, "%s\n", keys[i].arr_pointer);
     }
     
     fprintf(sort_file,"\n\n\n");
@@ -29,7 +30,7 @@ int print_original (char *buffer, FILE *sort_file, size_t num_all_symbol)
             buffer[i + 1] = '\n';
             i++;
         }
-
+        
         fputc (buffer[i], sort_file);
     }
 
